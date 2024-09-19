@@ -236,10 +236,7 @@ internal class ModelToTomlTransform
                     lastValue = prop.Value;
                     bool isRequiringInline = IsRequiringInline(prop.Value);
                     lastInline = isRequiringInline;
-                    if (isRequiringInline)
-                    {
-                        propInline = true;
-                    }
+
                 }
             }
 
@@ -272,7 +269,11 @@ internal class ModelToTomlTransform
 
                 // Special case to not output duplicated new lines that were already handled
                 // WriteKeyValue
-                if (!inline && (valueAccessor is PrimitiveDynamicAccessor || propToInline))
+                if (!inline &&
+                    (valueAccessor is PrimitiveDynamicAccessor ||
+                     (valueAccessor is ListDynamicAccessor listAccessor &&
+                      listAccessor.TargetType == typeof(TomlArray)) ||
+                     propToInline))
                 {
                     WriteTrailingTrivia(name);
                     _writer.WriteLine();
